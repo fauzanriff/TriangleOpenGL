@@ -1,13 +1,6 @@
 #include <GLFW/glfw3.h>
-#include <unistd.h>
 
 using namespace std;
-
-void animate(){
-
-
-}
-
 int main(void) {
     GLFWwindow* window;
 
@@ -25,35 +18,21 @@ int main(void) {
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    float a = 1.f;
+    glClearColor(0.0f, 0.5f, 0.8f, 0.0f);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
+        glClear(GL_COLOR_BUFFER_BIT);
         /* Render here */
-
-        if(a>=0.0f){
-            a -= 0.1f;
-        }
+        glBegin(GL_TRIANGLES);
 
         glBegin(GL_TRIANGLES);
-        glColor3f(a, 0.f, 0.f);
-        glVertex3f(-1.f, 0.f, 0.f);
-        glVertex3f(-0.5f, 1.f, 0.f);
-        glVertex3f(0.f, 0.f, 0.f);
-        glEnd();
-
-        glBegin(GL_TRIANGLES);
+        glColor3f(1.f, 0.f, 0.f);
+        glVertex3f(-0.5f, -0.5f, 0.f);
         glColor3f(0.f, 1.f, 0.f);
-        glVertex3f(1.f, 0.f, 0.f);
-        glVertex3f(0.5f, 1.f, 0.f);
-        glVertex3f(0.f, 0.f, 0.f);
-        glEnd();
-
-        glBegin(GL_TRIANGLES);
+        glVertex3f(0.f, 0.5f, 0.f);
         glColor3f(0.f, 0.f, 1.f);
-        glVertex3f(-0.5f, -1.f, 0.f);
-        glVertex3f(0.f, 0.f, 0.f);
-        glVertex3f(0.5f, -1.f, 0.f);
+        glVertex3f(0.5f, -0.5f, 0.f);
         glEnd();
 
         /* Swap front and back buffers */
@@ -61,7 +40,6 @@ int main(void) {
 
         /* Poll for and process events */
         glfwPollEvents();
-        sleep(1000);
     }
 
     glfwTerminate();
