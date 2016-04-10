@@ -25,19 +25,19 @@ int main(void) {
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    float a = 1.f;
+    float a = 0.0f;
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
         /* Render here */
 
-        if(a>=0.0f){
-            a -= 0.1f;
-        }
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        a = (a + 0.1f);
 
         glBegin(GL_TRIANGLES);
-        glColor3f(a, 0.f, 0.f);
-        glVertex3f(-1.f, 0.f, 0.f);
+        glColor3f(1.0f, 0.f, 0.f);
+        glVertex3f(-a, 0.f, 0.f);
         glVertex3f(-0.5f, 1.f, 0.f);
         glVertex3f(0.f, 0.f, 0.f);
         glEnd();
@@ -61,7 +61,7 @@ int main(void) {
 
         /* Poll for and process events */
         glfwPollEvents();
-        sleep(1000);
+        usleep(1000);
     }
 
     glfwTerminate();
