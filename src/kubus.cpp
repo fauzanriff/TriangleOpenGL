@@ -20,7 +20,7 @@ int main(void) {
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 
-    float angleY=0.f, angleZ=0.f;
+    float angleY=0.f, angleZ=0.f, angleX= 0.f;
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window)) {
@@ -28,7 +28,8 @@ int main(void) {
         glClearColor( 0.0f, 0.0f, 0.0f, 0.0f);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL);
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -36,6 +37,7 @@ int main(void) {
         glPushMatrix();
         glRotatef(angleY, 0.f, 1.0f, 1.f); // Rotate around the y axis.
         glRotatef(angleZ, 0.0f, 0.0f, 1.0f); // Rotate around the z axis.
+        glRotatef(angleX, 1.0f, 0.0f, 0.0f); // Rotate around the z axis.
 
         glBegin(GL_QUADS);
 
@@ -47,20 +49,20 @@ int main(void) {
         glVertex3f(0.5f, -0.5f, -0.5f);
         glVertex3f(-0.5f, -0.5f, -0.5f);
 
-        // glEnd();
+        glEnd();
 
-        // glBegin(GL_QUADS);
+        glBegin(GL_QUADS);
         //back
         glColor3f(0.f, 0.f, 1.f); //blue
 
-        glVertex3f(-0.5f, 0.5f, 0.  );
+        glVertex3f(-0.5f, 0.5f, 0.5f);
         glVertex3f(0.5, 0.5f, 0.5f);
         glVertex3f(0.5f, -0.5f, 0.5f);
         glVertex3f(-0.5f, -0.5f, 0.5f);
 
-        // glEnd();
+        glEnd();
 
-        // glBegin(GL_QUADS);
+        glBegin(GL_QUADS);
         //top
         glColor3f(0.f, 1.f, 0.f); //green
 
@@ -69,9 +71,9 @@ int main(void) {
         glVertex3f(0.5f, 0.5f, 0.5f);
         glVertex3f(-0.5f, 0.5f, 0.5f);
 
-        // glEnd();
+        glEnd();
 
-        // glBegin(GL_QUADS);
+        glBegin(GL_QUADS);
         //bottom
         glColor3f(1.f, 1.f, 0.f); //purple
 
@@ -80,9 +82,9 @@ int main(void) {
         glVertex3f(0.5f, -0.5f, 0.5f);
         glVertex3f(-0.5f, -0.5f, 0.5f);
 
-        // glEnd();
+        glEnd();
 
-        // glBegin(GL_QUADS);
+        glBegin(GL_QUADS);
         //right
         glColor3f(0.f, 0.5f, 1.f); 
 
@@ -91,9 +93,9 @@ int main(void) {
         glVertex3f(-0.5f, -0.5f, 0.5f);
         glVertex3f(-0.5f, 0.5f, 0.5f);
 
-        // glEnd();
+        glEnd();
 
-        // glBegin(GL_QUADS);
+        glBegin(GL_QUADS);
         //left
         glColor3f(0.f, 0.5f, 0.5f);
 
@@ -109,11 +111,14 @@ int main(void) {
         //Change Angle
         angleY += 2.f;
         angleZ += 3.f;
+        angleX += 1.f;
 
         if(angleY >= 360.0f)
             angleY -= 360.0f;
         if(angleZ >= 360.0f)
             angleZ -= 360.0f;
+        if(angleX >= 360.0f)
+            angleX -= 360.0f;
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
