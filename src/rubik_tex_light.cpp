@@ -95,6 +95,7 @@ void reset_rubik() {
     for(int i = 0; i<9; i++) {
         sisi[i+9].set_vertex(glm::vec3(dx, 0, dy), glm::vec3(mini_size, 0, 0), glm::vec3(0, 0, mini_size));
         sisi[i+9].color = glm::vec3(1, 0, 0); // RED
+
         dx += mini_size;
         if(dx >= 3*mini_size) {
             dy += mini_size;
@@ -105,6 +106,7 @@ void reset_rubik() {
     for(int i = 0; i<9; i++) {
         sisi[i+18].set_vertex(glm::vec3(0, dx, dy), glm::vec3(0, mini_size, 0), glm::vec3(0, 0, mini_size));
         sisi[i+18].color = glm::vec3(1, 1, 1); // WHITE
+
         dx += mini_size;
         if(dx >= 3*mini_size) {
             dy += mini_size;
@@ -176,8 +178,46 @@ int main(int argc, char** argv) {
     // glAlphaFunc( GL_GREATER, 0.5f );
 
     glEnable( GL_TEXTURE_2D );
+    //Lighting Setup
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_LIGHT1);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     
+    // Set lighting intensity and color
+    GLfloat qaAmbientLight[] = {0.2, 0.2, 0.2, 0.5};
+    GLfloat qaDiffuseLight[] = {0.8, 0.8, 0.8, 1.0};
+    GLfloat qaSpecularLight[] = {1.0, 1.0, 1.0, 1.0};
+
+    glLightfv(GL_LIGHT0, GL_AMBIENT, qaAmbientLight);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, qaDiffuseLight);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, qaSpecularLight);
+
+    GLfloat qaLightPosition[] = {-0.9, 0.5, 0.3, 1.0};
+    glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
+
+    // Set lighting intensity and color
+    GLfloat qsAmbientLight[] = {0.2, 0.1, 0.1, 0.5};
+    GLfloat qsDiffuseLight[] = {0.8, 0.9, 0.9, 1.0};
+    GLfloat qsSpecularLight[] = {1.0, 0, 0, 1.0};
+
+    glLightfv(GL_LIGHT1, GL_AMBIENT, qsAmbientLight);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, qsDiffuseLight);
+    glLightfv(GL_LIGHT1, GL_SPECULAR, qsSpecularLight);
+
+    GLfloat qsLightPosition[] = {3.9, -0.5, 2.3, 1.0};
+    glLightfv(GL_LIGHT1, GL_POSITION, qsLightPosition);
+
+    // Set material properties
+    GLfloat qaBlack[] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat qaGreen[] = {0.0, 1.0, 0.0, 0.2};
+    GLfloat qaWhite[] = {1.0, 1.0, 1.0, 1.0};
+    glMaterialfv(GL_FRONT, GL_AMBIENT, qaWhite);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, qaGreen);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, qaWhite);
+    glMaterialf(GL_FRONT, GL_SHININESS, 40.0);
+
     GLuint tex_ID;
     string load_me = "test_rect.png";
     if(argc > 1) {
