@@ -24,12 +24,14 @@ set< float > st;
 struct rec {
     glm::vec4 pos[4];
     glm::vec3 color;
+    glm::vec4 normal;
     rec() {}
-    rec(glm::vec3 off, glm::vec3 a, glm::vec3 b, glm::vec3 col) : color(col) {
+    rec(glm::vec3 off, glm::vec3 a, glm::vec3 b, glm::vec3 col, glm::vec3 norm) : color(col) {
         pos[0] = glm::vec4(off + a*0.005f + b*0.005f, 1);
         pos[1] = glm::vec4(off + a*0.985f + b*0.005f, 1);
         pos[2] = glm::vec4(off + a*0.985f + b*0.985f, 1);
         pos[3] = glm::vec4(off + a*0.005f + b*0.985f, 1);
+        normal = glm::vec4(norm.x, norm.y, norm.z, 1);
     }
     void set_vertex(glm::vec3 off, glm::vec3 a, glm::vec3 b) {
         pos[0] = glm::vec4(off + a*0.005f + b*0.005f, 1);
@@ -40,7 +42,8 @@ struct rec {
     void render() {
         glBegin(GL_QUADS);
         glColor3f(color.x, color.y, color.z);
-        // glNormal3d(0, 0, 1);
+        // glColor3f(1, 1, 1);
+        glNormal3f(normal.x, normal.y, normal.z);
         for(int i = 0; i<4; i++) {
             float xx = (float)pos[i].x/world_size.x*view_size.x + offset.x, 
                 yy = (float)pos[i].y/world_size.y*view_size.y + offset.y,
@@ -71,6 +74,7 @@ struct rec {
     void transform(glm::mat4 trans) {
         for(int i = 0; i<4; i++)
             pos[i] = trans * pos[i];
+        normal = trans * normal;
     }
     void calibrate() {
         for(int i = 0; i<4; i++) {
@@ -92,6 +96,7 @@ void reset_rubik() {
     for(int i = 0; i<9; i++) {
         sisi[i].set_vertex(glm::vec3(dx, dy, 0), glm::vec3(mini_size, 0, 0), glm::vec3(0, mini_size, 0));
         sisi[i].color = glm::vec3(0, 0, 1); // BLUE
+        sisi[i].normal = glm::vec4(0, 0, -1, 0);
         dx += mini_size;
         if(dx >= 3*mini_size) {
             dy += mini_size;
@@ -102,6 +107,7 @@ void reset_rubik() {
     for(int i = 0; i<9; i++) {
         sisi[i+9].set_vertex(glm::vec3(dx, 0, dy), glm::vec3(mini_size, 0, 0), glm::vec3(0, 0, mini_size));
         sisi[i+9].color = glm::vec3(1, 0, 0); // RED
+        sisi[i+9].normal = glm::vec4(0, -1, 0, 0);
 
         dx += mini_size;
         if(dx >= 3*mini_size) {
@@ -113,6 +119,7 @@ void reset_rubik() {
     for(int i = 0; i<9; i++) {
         sisi[i+18].set_vertex(glm::vec3(0, dx, dy), glm::vec3(0, mini_size, 0), glm::vec3(0, 0, mini_size));
         sisi[i+18].color = glm::vec3(1, 1, 1); // WHITE
+        sisi[i+18].normal = glm::vec4(-1, 0, 0, 0);
 
         dx += mini_size;
         if(dx >= 3*mini_size) {
@@ -124,6 +131,7 @@ void reset_rubik() {
     for(int i = 0; i<9; i++) {
         sisi[i+27].set_vertex(glm::vec3(dx, dy, 3*mini_size), glm::vec3(-mini_size, 0, 0), glm::vec3(0, -mini_size, 0));
         sisi[i+27].color = glm::vec3(100.0f/255.0f, 211.0f/255.0f, 23.0f/255.0f); //
+        sisi[i+27].normal = glm::vec4(0, 0, 1, 0);
         dx -= mini_size;
         if(dx <= 0) {
             dy -= mini_size;
@@ -134,6 +142,7 @@ void reset_rubik() {
     for(int i = 0; i<9; i++) {
         sisi[i+36].set_vertex(glm::vec3(dx, 3*mini_size, dy), glm::vec3(-mini_size, 0, 0), glm::vec3(0, 0, -mini_size));
         sisi[i+36].color = glm::vec3(1, 143/255.0f, 0); // ORANGE
+        sisi[i+36].normal = glm::vec4(0, 1, 0, 0);
         dx -= mini_size;
         if(dx <= 0) {
             dy -= mini_size;
@@ -144,6 +153,7 @@ void reset_rubik() {
     for(int i = 0; i<9; i++) {
         sisi[i+45].set_vertex(glm::vec3(3*mini_size, dx, dy), glm::vec3(0, -mini_size, 0), glm::vec3(0, 0, -mini_size));
         sisi[i+45].color = glm::vec3(1, 234.0f/255.0f, 0); // YELLOW
+        sisi[i+45].normal = glm::vec4(1, 0, 0, 0);
         dx -= mini_size;
         if(dx <= 0) {
             dy -= mini_size;
@@ -173,6 +183,7 @@ int main(int argc, char** argv) {
     glfwSetKeyCallback(window, key_callback);
 
 
+    glPushMatrix();
     // glEnable( GL_BLEND );
     //glDisable( GL_BLEND );
     //  straight alpha
@@ -194,29 +205,29 @@ int main(int argc, char** argv) {
     glEnable(GL_COLOR_MATERIAL);
     
     // Set lighting intensity and color
-    GLfloat qaAmbientLight[] = {0.0, 0.0, 1.0, 0.2};    //black
-    GLfloat qaDiffuseLight[] = {0.0, 1.0, 0.0, 0.5};    //white
-    GLfloat qaSpecularLight[] = {1.0, 0.0, 0.0, 0.5};   //white
+    GLfloat qaAmbientLight[] = {0.1, 0.025, 0.025, 1};    //black
+    GLfloat qaDiffuseLight[] = {0.8, 0.2, 0.2, 1};    //white
+    GLfloat qaSpecularLight[] = {1.0, 1, 1, 1};   //white
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, qaAmbientLight);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, qaDiffuseLight);
     glLightfv(GL_LIGHT0, GL_SPECULAR, qaSpecularLight);
 
-    GLfloat qaLightPosition[] = {-0.9, 0.5, 0.3, 1.0};
+    GLfloat qaLightPosition[] = {-0.8, 0.9, -1.1, 1.0};
     glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
 
     // Set lighting intensity and color
-    GLfloat qsAmbientLight[] = {0.0, 0.0, 1.0, 0.2};    //merah
-    GLfloat qsDiffuseLight[] = {1.0, 0.0, 0.0, 0.5};    //kuning
-    GLfloat qsSpecularLight[] = {0.0, 1.0, 0.0, 0.5};       //merah
+    GLfloat qsAmbientLight[] = {0.025, 0.1, 0.025, 1};    //merah
+    GLfloat qsDiffuseLight[] = {0.2, 0.8, 0.2, 1};    //kuning
+    GLfloat qsSpecularLight[] = {1, 1.0, 1, 1};       //merah
 
     glLightfv(GL_LIGHT1, GL_AMBIENT, qsAmbientLight);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, qsDiffuseLight);
     glLightfv(GL_LIGHT1, GL_SPECULAR, qsSpecularLight);
 
-    GLfloat qsLightPosition[] = {3.9, -0.5, 2.3, 1.0};
+    GLfloat qsLightPosition[] = {1.1, 0.9, 0.8, 1.0};
     glLightfv(GL_LIGHT1, GL_POSITION, qsLightPosition);
-
+    glPopMatrix();
     // Set material properties
     // GLfloat qaGreen[] = {0.0, 1.0, 0.0, 0.2};
     // GLfloat qaWhite[] = {1.0, 1.0, 1.0, 1.0};
